@@ -39,12 +39,25 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 로고
-                  const Text(
-                    'Career Quest',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF7C4DFF),
+                  RichText(
+                    text: TextSpan(
+                      style: const TextStyle(fontSize: 30,),
+                      children: const [
+                        TextSpan(
+                          text: 'Career',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' Quest',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF7C4DFF),    // 기존 보라색 유지
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   // 프로필 아이콘
