@@ -102,7 +102,7 @@ class _StartScreenState extends State<StartScreen> {
 
                 // 서브타이틀
                 const Text(
-                  '당신의 무한한 성장을 위한 가이드',
+                  '기업 과제로 실력을 증명하고, 채택으로 이력이 된다.',
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFF9E9E9E),

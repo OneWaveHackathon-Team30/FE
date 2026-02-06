@@ -334,7 +334,7 @@ class _AnswerDetailScreenState extends State<AnswerDetailScreen> {
                 child: TextField(
                   controller: _commentController,
                   decoration: const InputDecoration(
-                    hintText: '맛글을 입력하세요...',
+                    hintText: '댓글을 입력하세요...',
                     border: InputBorder.none,
                     hintStyle: TextStyle(
                       fontSize: 14,

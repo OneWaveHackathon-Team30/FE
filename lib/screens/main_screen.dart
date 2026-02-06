@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'quest_detail_screen.dart';
+import 'mypage_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -48,8 +49,13 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                   // 프로필 아이콘
                   GestureDetector(
                     onTap: () {
-                      // 마이페이지로 이동 (추후 구현)
-                      print('프로필 클릭');
+                      // 마이페이지로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyPageScreen(),
+                        ),
+                      );
                     },
                     child: Container(
                       width: 40,

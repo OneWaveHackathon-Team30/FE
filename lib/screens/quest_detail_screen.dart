@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'answer_detail_screen.dart';
+import 'answer_write_screen.dart';
 
 class ChallengeDetailScreen extends StatefulWidget {
   final String category;
@@ -457,7 +458,15 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    _showAnswerDialog();
+                    // 답변 작성 페이지로 이동
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AnswerWriteScreen(
+                          questTitle: widget.title,
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF7C4DFF),
@@ -650,39 +659,6 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  void _showAnswerDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('답변 제출'),
-          content: TextField(
-            controller: _answerController,
-            maxLines: 5,
-            decoration: const InputDecoration(
-              hintText: '마크다운 형식으로 답변을 작성해주세요',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('취소'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // 답변 제출 로직
-                Navigator.pop(context);
-                _answerController.clear();
-              },
-              child: const Text('제출'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
