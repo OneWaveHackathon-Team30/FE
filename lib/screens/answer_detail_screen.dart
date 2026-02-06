@@ -36,39 +36,83 @@ class _AnswerDetailScreenState extends State<AnswerDetailScreen> {
 
   void _refreshComments() {
     setState(() {
-      _commentsFuture = ApiService().getComments(widget.submissionId);
+      _commentsFuture = ApiService().getComments(widget.submissionId); // 댓글 목록 조회
     });
+  }
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('답변 상세보기')),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          '답변 상세보기',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          // 1. 답변 본문 영역 (기존 코드)
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.username, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(widget.date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                  const Divider(height: 30),
-                  Text(widget.content), // 마크다운 렌더러 사용 권장
-                  const SizedBox(height: 30),
-                  const Text('댓글', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
+                  // 작성자 정보
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Colors.grey[200],
+                        child: const Icon(Icons.person, color: Colors.grey, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          Text(widget.date, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 40),
 
-                  // 2. 댓글 목록 영역
+                  // 답변 내용
+                  Text(
+                    widget.content,
+                    style: const TextStyle(fontSize: 15, height: 1.6),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // 댓글 섹션 타이틀
+                  const Text('댓글', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+
+                  // 댓글 목록 영역
                   _buildCommentList(),
                 ],
               ),
             ),
           ),
 
-          // 3. 댓글 입력창 영역
+          // 댓글 입력창 영역
           _buildCommentInput(),
         ],
       ),
@@ -83,7 +127,14 @@ class _AnswerDetailScreenState extends State<AnswerDetailScreen> {
           return const Center(child: CircularProgressIndicator());
         }
         final comments = snapshot.data ?? [];
-        if (comments.isEmpty) return const Text('첫 댓글을 남겨보세요.');
+        if (comments.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Text('첫 댓글을 남겨보세요.', style: TextStyle(color: Colors.grey[500])),
+            ),
+          );
+        }
 
         return ListView.builder(
           shrinkWrap: true,
@@ -92,13 +143,15 @@ class _AnswerDetailScreenState extends State<AnswerDetailScreen> {
           itemBuilder: (context, index) {
             final comment = comments[index];
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.only(bottom: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(comment.authorNickname, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text(comment.content),
-                  Text(comment.createdAt, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                  const SizedBox(height: 4),
+                  Text(comment.content, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 2),
+                  Text(comment.createdAt, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
                 ],
               ),
             );
@@ -110,32 +163,49 @@ class _AnswerDetailScreenState extends State<AnswerDetailScreen> {
 
   Widget _buildCommentInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 8,
+        top: 8,
+        bottom: MediaQuery.of(context).padding.bottom + 8,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _commentController,
-              decoration: const InputDecoration(hintText: '댓글을 입력하세요...', border: InputBorder.none),
+              decoration: const InputDecoration(
+                hintText: '댓글을 입력하세요...',
+                border: InputBorder.none, // BorderSide.none에서 InputBorder.none으로 수정
+                contentPadding: EdgeInsets.symmetric(vertical: 10),
+              ),
             ),
           ),
           IconButton(
             icon: const Icon(Icons.send, color: Color(0xFF7C4DFF)),
             onPressed: () async {
-              if (_commentController.text.trim().isEmpty) return;
+              final content = _commentController.text.trim();
+              if (content.isEmpty) return;
 
+              // 댓글 작성 API 호출
               bool success = await ApiService().createComment(
-                  widget.submissionId,
-                  _commentController.text.trim()
+                widget.submissionId,
+                content,
               );
 
               if (success) {
                 _commentController.clear();
-                _refreshComments(); // 댓글 목록 새로고침
+                _refreshComments(); // 목록 새로고침
               }
             },
           ),

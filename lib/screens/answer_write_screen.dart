@@ -486,22 +486,31 @@ class _AnswerWriteScreenState extends State<AnswerWriteScreen>
 
   void _submitAnswer() async {
     final content = _contentController.text.trim();
-    if (content.isEmpty) return;
+    if (content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('내용을 입력해주세요.')));
+      return;
+    }
 
     setState(() => _isLoading = true);
 
     try {
-      // 4. ApiService() 괄호 확인 및 widget.scenarioId 확인
       bool success = await ApiService().createSubmission(
         widget.scenarioId,
         content,
       );
 
       if (success && mounted) {
-        Navigator.pop(context, true);
+        Navigator.pop(context, true); // 성공 시 true 반환하며 이전 화면 이동
+      } else if (mounted) {
+        // 실패 시 사용자에게 알림
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('등록에 실패했습니다. 다시 시도해주세요.')),
+        );
       }
     } catch (e) {
-      print('Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('오류 발생: $e')));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
