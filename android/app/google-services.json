@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "458549933390",
+    "project_id": "onewave-b0f24",
+    "storage_bucket": "onewave-b0f24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:458549933390:android:00f38879283d180e805a1f",
+        "android_client_info": {
+          "package_name": "com.team30.CareerQuest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDihbCgMQpJeOsJdRIAVHP_CQOxK6EPEto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

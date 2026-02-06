@@ -1,6 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.team30.CareerQuest">
     <application
-        android:label="onewave_fe"
+        android:label="Career Quest"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

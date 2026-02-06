@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onewave_fe/widgets/common_widgets.dart';
 import 'signup_screen.dart';
 import 'main_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -211,18 +212,49 @@ class _StartScreenState extends State<StartScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // 로그인 로직
-                      print('Email: ${_emailController.text}');
-                      print('Password: ${_passwordController.text}');
+                    onPressed: () async {
+                      try {
+                        if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('이메일과 비밀번호를 모두 입력해주세요.')),
+                          );
+                          return;
+                        }
 
-                      // 로그인 성공 시 메인 화면으로 이동
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainScreen(),
-                        ),
-                      );
+                        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),
+                        );
+
+                        print('로그인 성공: ${credential.user?.email}');
+
+                        if (!mounted) return;
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ),
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        String message = '';
+                        if (e.code == 'user-not-found') {
+                          message = '등록되지 않은 이메일입니다.';
+                        } else if (e.code == 'wrong-password') {
+                          message = '비밀번호가 틀렸습니다.';
+                        } else if (e.code == 'invalid-email') {
+                          message = '이메일 형식이 유효하지 않습니다.';
+                        } else {
+                          message = '로그인 오류: ${e.message}';
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('알 수 없는 오류가 발생했습니다.')),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF7C4DFF),
@@ -245,7 +277,6 @@ class _StartScreenState extends State<StartScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // 회원가입 링크
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -258,7 +289,6 @@ class _StartScreenState extends State<StartScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // 회원가입 페이지로 이동
                         Navigator.push(
                           context,
                           MaterialPageRoute(
