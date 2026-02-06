@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onewave_fe/widgets/common_widgets.dart';
 import 'signup_screen.dart';
 import 'main_screen.dart';
 
@@ -124,45 +125,12 @@ class _StartScreenState extends State<StartScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          hintText: 'example@email.com',
-                          hintStyle: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 15,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: Colors.grey[400],
-                            size: 20,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
-                    ),
+                    CareerTextField(
+                      controller: _emailController,
+                      hintText: 'example@email.com',
+                      prefixIcon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                    )
                   ],
                 ),
                 const SizedBox(height: 24),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onewave_fe/widgets/common_widgets.dart';
 import 'answer_detail_screen.dart';
 import 'answer_write_screen.dart';
 
@@ -93,43 +94,9 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
                         // 카테고리 배지들
                         Row(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF7C4DFF).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                '답변 받는 중',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF7C4DFF),
-                                ),
-                              ),
-                            ),
+                            CareerBadge(text: '답변 받는 중', color: Color(0xFF7C4DFF)),
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'AI 생성',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF616161),
-                                ),
-                              ),
-                            ),
+                            CareerBadge(text: 'AI 생성', color: Color(0xFF616161)),
                           ],
                         ),
                         const SizedBox(height: 16),

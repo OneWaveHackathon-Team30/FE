@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/start_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const OneWaveApp());
@@ -14,9 +15,11 @@ class OneWaveApp extends StatelessWidget {
       title: 'One Wave',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Pretendard', // 프로젝트에 폰트가 설정되어 있다면 적용
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7C4DFF)),
+        textTheme: GoogleFonts.interTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       home: const StartScreen(),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onewave_fe/widgets/common_widgets.dart';
 import 'quest_detail_screen.dart';
 import 'mypage_screen.dart';
 
@@ -211,24 +212,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 카테고리 배지
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: categoryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    category,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: categoryColor,
-                    ),
-                  ),
-                ),
+                CareerBadge(text: category, color: categoryColor),
                 const SizedBox(height: 16),
 
                 // 제목
