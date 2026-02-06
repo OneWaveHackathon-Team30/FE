@@ -506,15 +506,18 @@ class _AnswerWriteScreenState extends State<AnswerWriteScreen>
               Navigator.pop(context); // 다이얼로그 닫기
               Navigator.pop(context); // 작성 화면 닫기
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text('답변이 제출되었습니다'),
                   backgroundColor: Color(0xFF7C4DFF),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.only(
+                    bottom: 100,
+                    left: 20,
+                    right: 20,
+                  ),
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFFFFFF),
-            ),
             child: const Text('제출'),
           ),
         ],
