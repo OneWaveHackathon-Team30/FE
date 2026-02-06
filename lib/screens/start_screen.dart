@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onewave_fe/widgets/common_widgets.dart';
-import 'signup_screen.dart';
 import 'main_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -12,17 +9,6 @@ class StartScreen extends StatefulWidget {
 }
 
 class _StartScreenState extends State<StartScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,13 +22,13 @@ class _StartScreenState extends State<StartScreen> {
               children: [
                 // 로고 영역
                 Container(
-                  width:230,
+                  width: 230,
                   height: 230,
                   padding: const EdgeInsets.only(top: 50),
                   child: Image.asset(
                     'assets/images/logo.png',
                     fit: BoxFit.contain,
-                  )
+                  ),
                 ),
 
                 // 타이틀
@@ -59,168 +45,36 @@ class _StartScreenState extends State<StartScreen> {
                 // 서브타이틀
                 const Text(
                   '기업 과제로 실력을 증명하고, 채택으로 이력이 된다.',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFF9E9E9E),
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 64),
 
-                // 이메일 입력 필드
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'EMAIL ADDRESS',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF9E9E9E),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    CareerTextField(
-                      controller: _emailController,
-                      hintText: 'example@email.com',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                    )
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // 비밀번호 입력 필드
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'PASSWORD',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF9E9E9E),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: InputDecoration(
-                          hintText: '••••••••',
-                          hintStyle: TextStyle(
-                            color: Colors.grey[400],
-                            fontSize: 15,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                            color: Colors.grey[400],
-                            size: 20,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.grey[400],
-                              size: 20,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // 로그인 버튼
+                // 입장하기 버튼 (기존 로그인 버튼 수정)
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('이메일과 비밀번호를 모두 입력해주세요.')),
-                          );
-                          return;
-                        }
-
-                        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                          email: _emailController.text.trim(),
-                          password: _passwordController.text.trim(),
-                        );
-
-                        print('로그인 성공: ${credential.user?.email}');
-
-                        if (!mounted) return;
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
-                          ),
-                        );
-                      } on FirebaseAuthException catch (e) {
-                        String message = '';
-                        if (e.code == 'user-not-found') {
-                          message = '등록되지 않은 이메일입니다.';
-                        } else if (e.code == 'wrong-password') {
-                          message = '비밀번호가 틀렸습니다.';
-                        } else if (e.code == 'invalid-email') {
-                          message = '이메일 형식이 유효하지 않습니다.';
-                        } else {
-                          message = '로그인 오류: ${e.message}';
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(message)),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('알 수 없는 오류가 발생했습니다.')),
-                        );
-                      }
+                    onPressed: () {
+                      // 별도의 인증 없이 메인 화면으로 이동
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MainScreen()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF7C4DFF),
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      shadowColor: const Color(0xFF7C4DFF).withOpacity(0.3),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: const Text(
-                      '로그인',
+                      'Career Quest 입장하기',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -228,38 +82,6 @@ class _StartScreenState extends State<StartScreen> {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 24),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '아직 계정이 없으신가요?  ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignupScreen(),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        '회원가입',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF7C4DFF),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
