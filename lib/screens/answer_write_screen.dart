@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../services/api_service.dart';
+import '../models/scenario.dart';
 
 class AnswerWriteScreen extends StatefulWidget {
   final String questTitle;
+  final int scenarioId;
 
   const AnswerWriteScreen({
     super.key,
     required this.questTitle,
+    required this.scenarioId,
   });
 
   @override
@@ -18,6 +22,7 @@ class _AnswerWriteScreenState extends State<AnswerWriteScreen>
   late TabController _tabController;
   final TextEditingController _contentController = TextEditingController();
   bool _showGuide = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -479,49 +484,35 @@ class _AnswerWriteScreenState extends State<AnswerWriteScreen>
     );
   }
 
-  void _submitAnswer() {
-    if (_contentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('답변 내용을 입력해주세요'),
-          backgroundColor: Colors.red,
-        ),
-      );
+  void _submitAnswer() async {
+    final content = _contentController.text.trim();
+    if (content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('내용을 입력해주세요.')));
       return;
     }
 
-    // 답변 제출 처리
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('답변 제출'),
-        content: const Text('답변을 제출하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // 다이얼로그 닫기
-              Navigator.pop(context); // 작성 화면 닫기
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('답변이 제출되었습니다'),
-                  backgroundColor: Color(0xFF7C4DFF),
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.only(
-                    bottom: 100,
-                    left: 20,
-                    right: 20,
-                  ),
-                ),
-              );
-            },
-            child: const Text('제출'),
-          ),
-        ],
-      ),
-    );
+    setState(() => _isLoading = true);
+
+    try {
+      bool success = await ApiService().createSubmission(
+        widget.scenarioId,
+        content,
+      );
+
+      if (success && mounted) {
+        Navigator.pop(context, true); // 성공 시 true 반환하며 이전 화면 이동
+      } else if (mounted) {
+        // 실패 시 사용자에게 알림
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('등록에 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('오류 발생: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }

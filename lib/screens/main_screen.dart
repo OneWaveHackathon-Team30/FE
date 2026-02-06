@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:onewave_fe/widgets/common_widgets.dart';
 import 'quest_detail_screen.dart';
 import 'mypage_screen.dart';
+import '../services/api_service.dart';
+import '../models/scenario.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,11 +14,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late Future<List<Scenario>> _scenariosFuture;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _scenariosFuture = ApiService().getScenarios();
   }
 
   @override
@@ -126,14 +130,15 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             ),
 
             // 탭 컨텐츠
+            // lib/screens/main_screen.dart의 TabBarView 부분
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // AI 생성 탭
-                  _buildChallengeList(),
-                  // 기업 주최 탭 (동일한 리스트)
-                  _buildChallengeList(),
+                  // AI 생성 탭 (GEMINI 데이터 조회)
+                  _buildChallengeList('GEMINI'),
+                  // 기업 주최 탭 (COMPANY 데이터 조회)
+                  _buildChallengeList('COMPANY'),
                 ],
               ),
             ),
@@ -143,48 +148,53 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildChallengeList() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _buildChallengeCard(
-          category: '답변 받는 중',
-          categoryColor: const Color(0xFF7C4DFF),
-          title: '신입 서비스 기획자를 위한 AI 역량 강화 프로젝트: 이커머스 분석',
-          dueDate: '2025.05.30',
-          field: 'AI 커리어 튜터',
-          participants: '128명 참여 중',
-        ),
-        const SizedBox(height: 16),
-        _buildChallengeCard(
-          category: '채택 중',
-          categoryColor: const Color(0xFFFF9800),
-          title: '데이터 사이언티스트 실무 과제: 금융 트렌드 예측 모델링',
-          dueDate: '2025.04.15',
-          field: '데이터 마스터 AI',
-          participants: '84명 참여 중',
-        ),
-        const SizedBox(height: 16),
-        _buildChallengeCard(
-          category: '채택 완료',
-          categoryColor: Colors.grey[400]!,
-          title: 'UX/UI 디자인 시스템 구축 가이드라인 제작 챌린지',
-          dueDate: '2025.03.10',
-          field: '디자인 멘토 AI',
-          participants: '256명 참여 완료',
-          isCompleted: true,
-        ),
-      ],
+  Widget _buildChallengeList(String sourceFilter) {
+    return FutureBuilder<List<Scenario>>(
+      future: _scenariosFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          print('Error: ${snapshot.error}');
+          return Center(child: Text('에러 상세: ${snapshot.error}'));
+        }
+
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: Text('데이터가 없습니다.'));
+        }
+
+        // source 값에 따라 필터링 (GEMINI: AI 생성, COMPANY: 기업 주최)
+        final filteredList = snapshot.data!
+            .where((s) => s.source == sourceFilter)
+            .toList();
+
+        if (filteredList.isEmpty) {
+          return const Center(child: Text('등록된 퀘스트가 없습니다.'));
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(16),
+          itemCount: filteredList.length,
+          itemBuilder: (context, index) {
+            final scenario = filteredList[index]; // 여기서 scenario가 정의됨
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _buildChallengeCard(
+                scenario: scenario,
+                category: scenario.status == 'OPEN' ? '답변 받는 중' : '마감됨',
+                categoryColor: scenario.status == 'OPEN' ? const Color(0xFF7C4DFF) : Colors.grey,
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
   Widget _buildChallengeCard({
+    required Scenario scenario,
     required String category,
     required Color categoryColor,
-    required String title,
-    required String dueDate,
-    required String field,
-    required String participants,
     bool isCompleted = false,
   }) {
     return Container(
@@ -204,18 +214,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // 챌린지 상세 페이지로 이동
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChallengeDetailScreen(
-                  category: category,
-                  title: title,
-                  dueDate: dueDate,
-                  field: field,
-                  participants: participants,
-                  isCompleted: isCompleted,
-                ),
+                builder: (context) => ChallengeDetailScreen(scenarioId: scenario.id),
               ),
             );
           },
@@ -230,7 +232,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
 
                 // 제목
                 Text(
-                  title,
+                  scenario.title,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -250,7 +252,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '마감 일자 : $dueDate',
+                      '마감 일자 : ${scenario.dueAt}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],
@@ -270,7 +272,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '생성자 : $field',
+                      '생성자 : ${scenario.companyName}',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],
@@ -285,16 +287,18 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      participants,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
-                      ),
+                      '${scenario.submissionsCount}명 참여 중', // participants -> 계산된 문자열
+                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                     ),
                     if (isCompleted)
                       GestureDetector(
                         onTap: () {
-                          print('결과 보기 클릭');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MyPageScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           '결과 보기',

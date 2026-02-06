@@ -104,7 +104,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
-          // 프로필 아이콘
           Container(
             width: 72,
             height: 72,
@@ -113,31 +112,17 @@ class _MyPageScreenState extends State<MyPageScreen> {
               borderRadius: BorderRadius.circular(50),
             ),
             child: const Center(
-              child: Text(
-                'CQ',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              child: Text('CQ', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
             ),
           ),
-
           const SizedBox(width: 20),
-
-          // 사용자 이름
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '김유저',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF212121),
-                  ),
+                  '사용자', // 고정 닉네임 사용
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF212121)),
                 ),
               ],
             ),
