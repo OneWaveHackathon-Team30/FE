@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/start_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const OneWaveApp());
@@ -16,10 +16,7 @@ class OneWaveApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF7C4DFF)),
-        textTheme: GoogleFonts.interTextTheme(
-          Theme.of(context).textTheme,
-        ),
+        fontFamily: 'Pretendard',
       ),
       home: const StartScreen(),
     );
