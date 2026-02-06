@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/common_widgets.dart'; // 공통 컴포넌트 임포트
+import '../widgets/common_widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -142,12 +144,39 @@ class _SignupScreenState extends State<SignupScreen> {
               CareerButton(
                 text: '가입 완료하기',
                 onPressed: _agreeToTerms
-                    ? () {
-                  // 회원가입 로직
-                  print('Email: ${_emailController.text}');
-                  Navigator.pop(context);
+                    ? () async {
+                  try {
+                    // 1. Firebase 계정 생성
+                    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: _emailController.text.trim(),
+                      password: _passwordController.text.trim(),
+                    );
+
+                    // 2. 백엔드 서버 연동 (서버가 아직 준비되지 않았다면 이 부분을 주석 처리하세요)
+                    // try {
+                    //   final apiService = ApiService();
+                    //   await apiService.loginWithNickname(_nicknameController.text.trim());
+                    // } catch (serverError) {
+                    //   print('서버 저장 실패: $serverError');
+                    //   // 서버 저장에 실패해도 가입은 됐으므로 진행하거나 사용자에게 알림
+                    // }
+
+                    // 3. 성공 알림 및 화면 전환
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('회원가입이 완료되었습니다!')),
+                    );
+                    Navigator.pop(context); // 로그인 화면으로 돌아가기
+
+                  } catch (e) {
+                    // 에러 발생 시 로그 출력 및 사용자 알림
+                    print('회원가입 실패 원인: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('가입 실패: ${e.toString()}')),
+                    );
+                  }
                 }
-                    : null, // 약관 미동의 시 버튼 비활성화
+                    : null,
               ),
               const SizedBox(height: 24),
 
